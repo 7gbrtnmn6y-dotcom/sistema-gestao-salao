@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Belle | Sistema de Gestão</title>
+<style>
+:root{--pink:#c56f91;--pink2:#f8eaf0;--ink:#29242a;--muted:#77717a;--bg:#faf8f9;--white:#fff;--line:#eee5e9;--green:#27845b;--red:#b94757}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px Arial,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#8e4968,#c56f91);color:white;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-size:22px}header small{opacity:.9}
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 80px)}
+nav{background:#fff;border-right:1px solid var(--line);padding:18px 12px}
+nav button{display:block;width:100%;border:0;background:transparent;text-align:left;padding:13px;border-radius:9px;margin:3px 0;color:#514650;cursor:pointer;font-size:14px}
+nav button.active,nav button:hover{background:var(--pink2);color:#873e5d;font-weight:bold}
+main{padding:26px;max-width:1250px;width:100%;margin:auto}
+h2{margin:0 0 7px;font-size:24px} .sub{color:var(--muted);margin:0 0 22px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:14px;margin-bottom:20px}
+.card,.panel{background:white;border:1px solid var(--line);border-radius:13px;padding:17px;box-shadow:0 3px 12px #5c31400a}
+.card span{color:var(--muted);font-size:13px}.card strong{display:block;font-size:27px;margin-top:9px}
+.panel{margin-bottom:16px}.panel h3{margin:0 0 14px}
+.toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+button.primary{background:var(--pink);color:white;border:0;border-radius:8px;padding:10px 14px;cursor:pointer;font-weight:bold}
+button.secondary{background:#f4edf0;border:1px solid #eadde3;color:#694356;border-radius:8px;padding:9px 12px;cursor:pointer}
+input,select{padding:10px;border:1px solid #ddd1d8;border-radius:8px;font-size:14px;background:white;min-width:0}
+input:focus,select:focus{outline:2px solid #e8b9cc}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}
+.tag{display:inline-block;padding:5px 8px;border-radius:20px;background:var(--pink2);color:#8b4562;font-size:12px}
+.empty{padding:22px;text-align:center;color:var(--muted)}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:13px;color:var(--muted)}
+.actions{display:flex;gap:7px}.actions button{border:0;background:#f5edf1;padding:6px 9px;border-radius:6px;cursor:pointer}
+.notice{background:#fff8e9;border:1px solid #f0dfb9;color:#785a1d;padding:12px;border-radius:9px;margin-bottom:15px}
+.hidden{display:none!important}.money{font-weight:bold;color:var(--green)}
+@media(max-width:800px){.shell{grid-template-columns:1fr}nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--line)}nav button{white-space:nowrap;width:auto}.cards{grid-template-columns:repeat(2,1fr)}main{padding:17px}.formgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div><h1>Studio Belle</h1><small>Sistema de gestão para salão de beleza · Protótipo acadêmico</small></div><div id="today"></div></header>
+<div class="shell">
+<nav id="nav">
+<button class="active" data-page="inicio">▦ Visão geral</button>
+<button data-page="clientes">♙ Clientes</button>
+<button data-page="agenda">▣ Agendamentos</button>
+<button data-page="servicos">✧ Serviços</button>
+<button data-page="estoque">▤ Estoque</button>
+<button data-page="financeiro">R$ Financeiro</button>
+</nav>
+<main>
+<section id="inicio" class="page">
+<h2>Visão geral</h2><p class="sub">Resumo das atividades cadastradas no sistema.</p>
+<div class="cards">
+<div class="card"><span>Clientes cadastrados</span><strong id="kClientes">0</strong></div>
+<div class="card"><span>Agendamentos</span><strong id="kAgenda">0</strong></div>
+<div class="card"><span>Serviços ativos</span><strong id="kServicos">0</strong></div>
+<div class="card"><span>Saldo registrado</span><strong id="kSaldo">R$ 0,00</strong></div>
+</div>
+<div id="alertas"></div>
+<div class="panel"><h3>Próximos atendimentos</h3><div id="proximos"></div></div>
+<p class="sub">Os dados ficam salvos neste navegador para demonstração. Utilize informações fictícias durante a apresentação.</p>
+</section>
+
+<section id="clientes" class="page hidden">
+<div class="toolbar"><div><h2>Clientes</h2><p class="sub">Cadastro e consulta de clientes.</p></div><button class="primary" onclick="formCliente()">+ Novo cliente</button></div>
+<div id="formClienteBox" class="panel hidden"></div><div class="panel"><div id="listaClientes"></div></div>
+</section>
+
+<section id="agenda" class="page hidden">
+<div class="toolbar"><div><h2>Agendamentos</h2><p class="sub">Organize os horários e acompanhe os atendimentos.</p></div><button class="primary" onclick="formAgenda()">+ Novo agendamento</button></div>
+<div id="formAgendaBox" class="panel hidden"></div><div class="panel"><div id="listaAgenda"></div></div>
+</section>
+
+<section id="servicos" class="page hidden">
+<div class="toolbar"><div><h2>Serviços</h2><p class="sub">Procedimentos oferecidos pelo salão.</p></div><button class="primary" onclick="formServico()">+ Novo serviço</button></div>
+<div id="formServicoBox" class="panel hidden"></div><div class="panel"><div id="listaServicos"></div></div>
+</section>
+
+<section id="estoque" class="page hidden">
+<div class="toolbar"><div><h2>Estoque</h2><p class="sub">Controle simples de produtos e quantidades.</p></div><button class="primary" onclick="formProduto()">+ Novo produto</button></div>
+<div id="formProdutoBox" class="panel hidden"></div><div class="panel"><div id="listaEstoque"></div></div>
+</section>
+
+<section id="financeiro" class="page hidden">
+<div class="toolbar"><div><h2>Financeiro</h2><p class="sub">Registre entradas e despesas.</p></div><button class="primary" onclick="formLancamento()">+ Novo lançamento</button></div>
+<div id="formFinBox" class="panel hidden"></div><div class="panel"><div id="listaFin"></div></div>
+</section>
+</main></div>
+<script>
+const $=id=>document.getElementById(id);
+const load=(k)=>JSON.parse(localStorage.getItem('sb_'+k)||'[]');
+const save=(k,v)=>{localStorage.setItem('sb_'+k,JSON.stringify(v));render()};
+let clientes=load('clientes'),agenda=load('agenda'),servicos=load('servicos'),produtos=load('produtos'),fin=load('fin');
+const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+$('today').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));$(b.dataset.page).classList.remove('hidden');render()});
+function table(headers,rows){if(!rows.length)return '<div class="empty">Nenhum registro cadastrado.</div>';return '<div style="overflow:auto"><table><thead><tr>'+headers.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>'}
+function formBox(id,html){$(id).innerHTML=html;$(id).classList.remove('hidden')}
+function closeBox(id){$(id).classList.add('hidden')}
+function formCliente(){formBox('formClienteBox',`<h3>Novo cliente</h3><form onsubmit="addCliente(event)" class="formgrid"><div class="field"><label>Nome</label><input name="nome" required></div><div class="field"><label>Telefone</label><input name="telefone" required></div><div><button class="primary">Salvar cliente</button> <button type="button" class="secondary" onclick="closeBox('formClienteBox')">Cancelar</button></div></form>`)}
+function addCliente(e){e.preventDefault();let f=new FormData(e.target);clientes.push({id:Date.now(),nome:f.get('nome'),telefone:f.get('telefone')});save('clientes',clientes);closeBox('formClienteBox')}
+function del(k,id){if(!confirm('Deseja excluir este registro?'))return;let a=load(k).filter(x=>x.id!==id);save(k,a);if(k==='clientes')clientes=a;if(k==='agenda')agenda=a;if(k==='servicos')servicos=a;if(k==='produtos')produtos=a;if(k==='fin')fin=a}
+function formServico(){formBox('formServicoBox',`<h3>Novo serviço</h3><form onsubmit="addServico(event)" class="formgrid"><div class="field"><label>Nome</label><input name="nome" required></div><div class="field"><label>Duração (minutos)</label><input name="duracao" type="number" min="1" required></div><div class="field"><label>Preço (R$)</label><input name="preco" type="number" min="0" step=".01" required></div><div><button class="primary">Salvar serviço</button> <button type="button" class="secondary" onclick="closeBox('formServicoBox')">Cancelar</button></div></form>`)}
+function addServico(e){e.preventDefault();let f=new FormData(e.target);servicos.push({id:Date.now(),nome:f.get('nome'),duracao:+f.get('duracao'),preco:+f.get('preco')});save('servicos',servicos);closeBox('formServicoBox')}
+function formAgenda(){if(!clientes.length||!servicos.length){alert('Cadastre pelo menos um cliente e um serviço antes de agendar.');return}
+formBox('formAgendaBox',`<h3>Novo agendamento</h3><form onsubmit="addAgenda(event)" class="formgrid"><div class="field"><label>Cliente</label><select name="cliente">${clientes.map(c=>`<option value="${c.id}">${esc(c.nome)}</option>`)}</select></div><div class="field"><label>Serviço</label><select name="servico">${servicos.map(s=>`<option value="${s.id}">${esc(s.nome)}</option>`)}</select></div><div class="field"><label>Profissional</label><input name="profissional" required></div><div class="field"><label>Data</label><input name="data" type="date" required></div><div class="field"><label>Horário</label><input name="hora" type="time" required></div><div><button class="primary">Salvar agendamento</button> <button type="button" class="secondary" onclick="closeBox('formAgendaBox')">Cancelar</button></div></form>`)}
+function addAgenda(e){e.preventDefault();let f=new FormData(e.target),dt=f.get('data'),hr=f.get('hora'),prof=f.get('profissional').trim(),svc=servicos.find(s=>s.id==f.get('servico')),end=new Date(`${dt}T${hr}`);end.setMinutes(end.getMinutes()+(svc?.duracao||0));let start=new Date(`${dt}T${hr}`);let conflict=agenda.some(a=>a.data===dt&&a.profissional.toLowerCase()===prof.toLowerCase()&&a.status!=='Cancelado'&&start<new Date(`${a.data}T${a.fim}`)&&end>new Date(`${a.data}T${a.hora}`));if(conflict){alert('Conflito: este profissional já possui atendimento nesse intervalo.');return}agenda.push({id:Date.now(),cliente:+f.get('cliente'),servico:+f.get('servico'),profissional:prof,data:dt,hora:hr,fim:end.toTimeString().slice(0,5),status:'Agendado'});save('agenda',agenda);closeBox('formAgendaBox')}
+function formProduto(){formBox('formProdutoBox',`<h3>Novo produto</h3><form onsubmit="addProduto(event)" class="formgrid"><div class="field"><label>Produto</label><input name="nome" required></div><div class="field"><label>Quantidade</label><input name="qtd" type="number" min="0" required></div><div class="field"><label>Estoque mínimo</label><input name="min" type="number" min="0" required></div><div><button class="primary">Salvar produto</button> <button type="button" class="secondary" onclick="closeBox('formProdutoBox')">Cancelar</button></div></form>`)}
+function addProduto(e){e.preventDefault();let f=new FormData(e.target);produtos.push({id:Date.now(),nome:f.get('nome'),qtd:+f.get('qtd'),min:+f.get('min')});save('produtos',produtos);closeBox('formProdutoBox')}
+function alterarEstoque(id,delta){let p=produtos.find(x=>x.id===id);if(!p)return;if(p.qtd+delta<0){alert('Quantidade insuficiente.');return}p.qtd+=delta;save('produtos',produtos)}
+function formLancamento(){formBox('formFinBox',`<h3>Novo lançamento</h3><form onsubmit="addFin(event)" class="formgrid"><div class="field"><label>Tipo</label><select name="tipo"><option>Entrada</option><option>Despesa</option></select></div><div class="field"><label>Descrição</label><input name="desc" required></div><div class="field"><label>Valor (R$)</label><input name="valor" type="number" min=".01" step=".01" required></div><div class="field"><label>Data</label><input name="data" type="date" required></div><div><button class="primary">Salvar lançamento</button> <button type="button" class="secondary" onclick="closeBox('formFinBox')">Cancelar</button></div></form>`)}
+function addFin(e){e.preventDefault();let f=new FormData(e.target);fin.push({id:Date.now(),tipo:f.get('tipo'),desc:f.get('desc'),valor:+f.get('valor'),data:f.get('data')});save('fin',fin);closeBox('formFinBox')}
+function render(){
+clientes=load('clientes');agenda=load('agenda');servicos=load('servicos');produtos=load('produtos');fin=load('fin');
+$('kClientes').textContent=clientes.length;$('kAgenda').textContent=agenda.length;$('kServicos').textContent=servicos.length;
+let saldo=fin.reduce((s,x)=>s+(x.tipo==='Entrada'?x.valor:-x.valor),0);$('kSaldo').textContent=money(saldo);
+let baixos=produtos.filter(p=>p.qtd<=p.min);$('alertas').innerHTML=baixos.length?`<div class="notice">Atenção: ${baixos.map(p=>esc(p.nome)).join(', ')} — estoque no limite mínimo ou abaixo.</div>`:'';
+let prox=[...agenda].sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora)).filter(a=>a.status!=='Cancelado').slice(0,6);
+$('proximos').innerHTML=table(['Data','Hora','Cliente','Serviço','Profissional'],prox.map(a=>`<tr><td>${a.data}</td><td>${a.hora}</td><td>${esc(clientes.find(c=>c.id===a.cliente)?.nome||'Cliente removido')}</td><td>${esc(servicos.find(s=>s.id===a.servico)?.nome||'Serviço removido')}</td><td>${esc(a.profissional)}</td></tr>`));
+$('listaClientes').innerHTML=table(['Nome','Telefone','Ações'],clientes.map(c=>`<tr><td>${esc(c.nome)}</td><td>${esc(c.telefone)}</td><td><button class="secondary" onclick="del('clientes',${c.id})">Excluir</button></td></tr>`));
+$('listaServicos').innerHTML=table(['Serviço','Duração','Preço','Ações'],servicos.map(s=>`<tr><td>${esc(s.nome)}</td><td>${s.duracao} min</td><td>${money(s.preco)}</td><td><button class="secondary" onclick="del('servicos',${s.id})">Excluir</button></td></tr>`));
+$('listaAgenda').innerHTML=table(['Data','Hora','Cliente','Serviço','Profissional','Status','Ações'],agenda.map(a=>`<tr><td>${a.data}</td><td>${a.hora}</td><td>${esc(clientes.find(c=>c.id===a.cliente)?.nome||'—')}</td><td>${esc(servicos.find(s=>s.id===a.servico)?.nome||'—')}</td><td>${esc(a.profissional)}</td><td><span class="tag">${a.status}</span></td><td><div class="actions"><button onclick="statusAgenda(${a.id},'Concluído')">Concluir</button><button onclick="statusAgenda(${a.id},'Cancelado')">Cancelar</button><button onclick="del('agenda',${a.id})">Excluir</button></div></td></tr>`));
+$('listaEstoque').innerHTML=table(['Produto','Quantidade','Mínimo','Movimentação'],produtos.map(p=>`<tr><td>${esc(p.nome)}</td><td>${p.qtd}</td><td>${p.min}</td><td><div class="actions"><button onclick="alterarEstoque(${p.id},1)">+ Entrada</button><button onclick="alterarEstoque(${p.id},-1)">− Saída</button><button onclick="del('produtos',${p.id})">Excluir</button></div></td></tr>`));
+$('listaFin').innerHTML=table(['Data','Tipo','Descrição','Valor','Ações'],fin.map(x=>`<tr><td>${x.data}</td><td>${x.tipo}</td><td>${esc(x.desc)}</td><td class="${x.tipo==='Entrada'?'money':''}">${money(x.valor)}</td><td><button class="secondary" onclick="del('fin',${x.id})">Excluir</button></td></tr>`));
+}
+function statusAgenda(id,status){let a=agenda.find(x=>x.id===id);if(a){a.status=status;save('agenda',agenda)}}
+render();
+</script>
+</body></html>
